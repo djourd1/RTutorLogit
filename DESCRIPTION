@@ -1,0 +1,12 @@
+Package: RTutorLogit
+Type: Package
+Title: RTutor problem set Logit
+Version: 0.1
+Date: 2020-05-04
+Author: Damien Jourdain
+Maintainer: Damien Jourdain <damien.jourdain@cirad.fr>
+Description: RTutor problem set Logit
+License: Not yet licensed by the author. The default suggestion for licensing is
+	Problem set content: Creative Commons (CC BY-SA)
+	Package code: GPL >= 2.0
+Depends: RTutor, ggplot2, readxl, tidyverse

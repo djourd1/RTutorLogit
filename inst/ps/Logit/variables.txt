@@ -1,0 +1,7 @@
+orgvar | var | descr 
+
+switch	| switch | switch indicator (1 if switched, 0 if not switched)
+arsenic	| arsenic | The arsenic level of respondent’s well
+dist	| dist | The distance (in meters) to the closest known safe well
+assoc	| assoc | Whether any members of the household are active in community organizations
+educ | educ | The education level of the head of household.

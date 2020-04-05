@@ -1,0 +1,94 @@
+# Logit/Probit Regression
+
+Welcome
+
+#< ignore
+
+```{r "Create problem set files"}
+library(RTutor)
+setwd("D:/Mes Donnees/__modelesR/RTutor/Logit/Logit")
+ps.name = "Logit"; sol.file = paste0(ps.name,"_sol.Rmd")
+libs = c("ggplot2", "readxl", "tidyverse") # 
+
+create.ps(sol.file=sol.file, ps.name=ps.name, user.name=NULL, libs=libs, var.txt.file = "variables.txt",addons = "quiz")
+
+show.ps(ps.name,launch.browser=TRUE,
+  auto.save.code=FALSE,sample.solution=FALSE)
+```
+
+#>
+
+
+
+## Exercise 2: Check -- Check the data
+
+We will check the data set. Each exercise are created so they do not depend on the previous one. So we will first need to import the data again. To be sure, you remember the commands, you will need to import the data again.
+
+**Task:** Import the data from `wells.xlsx` and save them in a data.frame named `wells`. In a second line of code, use the command `head` to view the first records of the data frame you have just created
+
+```{r "2 import"}
+#< task
+# replace the #... with your codes
+# ...
+# ...
+#>
+wells <- read_excel("wells.xlsx")
+head(wells)
+#< hint
+display("On the first line, wells <- read_excel(\"wells.xlsx\"). On the second line, type:  head(wells)")
+#>
+```
+
+#### Transform binary variables into factor
+
+To facilitate data analysis, we will transform some of the variables. The first transformation is to change the variable `switch`, currently a numeric variable into a factor variable. (Click on the info button just below if you do not know what a factor is)
+
+#< info "Factors"
+A factor is a data type in R that was developed to work with nomimal variables. If you are new to factors in R, here are 2 references to check before you go further:
+
+If you prefer video explanations, check this link: <a href="https://www.youtube.com/embed/xkRBfy8_2MU" target="_blank">R tutorial - Using Factors in R by DataCamp </a>
+
+If you prefer text explanations, check this link: <a href="https://www.stat.berkeley.edu/~s133/factors.html" target="_blank">Factors in R </a>
+#>
+
+**Task**: 
+
+1. Create a new factor by converting the numerical variable `switch` into a factor variable, where the labels of the levels are changed according to the rule 1 -> "Changed", 0 -> "Kept", and will be used in that order. Name your newly created variable `changed`
+
+2. View the first values of the variable to check the results obtained
+
+```{r "2 factor"}
+#< task
+# type your commands here
+#>
+wells$changed <- factor(wells$switch, levels= c(1,0), labels=c("Changed", "Kept"))
+head(wells$changed)
+#< hint
+display("You must apply the function `factor` to a the variable switch. Do not forget to specify the levels and the labels. Do not forget to create a new variable and do not forget to indicate that the variable `switch` and the variables `changed` belongs to the data frame `wells`.  ")
+#>
+```
+
+#### Summarize the data
+
+#< info "`summary` applied to a data.frame object"
+The command `summary` can be applied to different R objects, e.g. data frames, model results, etc. When applied to a data frame, it will output the basic statistics (minimum, maximum, mean, quartiles) of all the variables
+
+To summarize the variables on the data frame `data`, use the command
+```{r "2 info_summary",eval=FALSE}
+summary(data)
+```
+#>
+
+The command `summary` is helpful to get a rapid overview of the data.
+
+```{r "2 summary"}
+#< task
+# type your command
+#>
+summary(wells)
+#< hint
+display("Write: summary(xxx)  where xxx is the name of the data frame. Then press check.")
+#>
+```
+
+

@@ -1,0 +1,61 @@
+
+```{r 'check_ps', include=FALSE}
+
+user.name = '' # set to your user name
+
+# To check your problem set, run the 
+# RStudio Addin 'Check Problemset'
+
+# Alternatively run the following lines
+library(RTutor)
+ps.dir = getwd() # directory of this file
+ps.file = 'Logit.Rmd' # name of this file
+check.problem.set('Logit', ps.dir, ps.file, user.name=user.name, reset=FALSE)
+```
+
+# Logit/Probit Regression
+
+Welcome
+
+
+
+
+## Exercise 2: Check -- Check the data
+
+We will check the data set. Each exercise are created so they do not depend on the previous one. So we will first need to import the data again. To be sure, you remember the commands, you will need to import the data again.
+
+**Task:** Import the data from `wells.xlsx` and save them in a data.frame named `wells`. In a second line of code, use the command `head` to view the first records of the data frame you have just created
+
+```{r "2__Check"}
+# replace the #... with your codes
+# ...
+# ...
+```
+
+#### Transform binary variables into factor
+
+To facilitate data analysis, we will transform some of the variables. The first transformation is to change the variable `switch`, currently a numeric variable into a factor variable. (Click on the info button just below if you do not know what a factor is)
+
+info("Factors") # Run this line (Strg-Enter) to show info
+
+**Task**: 
+
+1. Create a new factor by converting the numerical variable `switch` into a factor variable, where the labels of the levels are changed according to the rule 1 -> "Changed", 0 -> "Kept", and will be used in that order. Name your newly created variable `changed`
+
+2. View the first values of the variable to check the results obtained
+
+```{r "2__Check__2"}
+# type your commands here
+```
+
+#### Summarize the data
+
+info("`summary` applied to a data.frame object") # Run this line (Strg-Enter) to show info
+
+The command `summary` is helpful to get a rapid overview of the data.
+
+```{r "2__Check__4"}
+# type your command
+```
+
+
