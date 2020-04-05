@@ -202,9 +202,9 @@ Write your answer text inside the quotes " " as an R String and press `Check`.
 (Note that you always see afterwards the message "Great, solved correctly."
  But your answer will in fact be graded after you submit your problem set.)
    
-```{r "2comment"}
+```{r "2comment",results='hide'}
 #< task_notest
-"
+" 
 Insert your answer here in those quotes
   
   
