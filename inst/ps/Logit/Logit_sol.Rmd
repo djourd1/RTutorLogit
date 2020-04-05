@@ -8,15 +8,15 @@ Welcome
 library(RTutor)
 setwd("D:/Mes Donnees/__modelesR/RTutor/Logit/Logit")
 ps.name = "Logit"; sol.file = paste0(ps.name,"_sol.Rmd")
-libs = c("ggplot2", "readxl", "tidyverse") # 
+libs = c("readxl", "tidyverse") # 
 
 create.ps(sol.file=sol.file, ps.name=ps.name, user.name=NULL, libs=libs, var.txt.file = "variables.txt",addons = "quiz")
 
-show.ps(ps.name,launch.browser=TRUE,
-  auto.save.code=FALSE,sample.solution=FALSE)
+show.ps(ps.name, user.name = "Damien", launch.browser=TRUE,
+  auto.save.code=FALSE, sample.solution=FALSE)
 ```
 
-#>
+#> 
 
 
 
@@ -27,7 +27,6 @@ We will check the data set. Each exercise are created so they do not depend on t
 **Task:** Import the data from `wells.xlsx` and save them in a data.frame named `wells`. In a second line of code, use the command `head` to view the first records of the data frame you have just created
 
 ```{r "2 import"}
-library(readxl)
 #< task
 # replace the #... with your codes
 # ...
@@ -92,4 +91,130 @@ display("Write: summary(xxx)  where xxx is the name of the data frame. Then pres
 #>
 ```
 
+### Making plots
+
+#### One variable plot 
+
+Another way to check the data that you will be using is to draw some plots to identify potential outliers. The easiest way to do this is to use the function `plot()` with one variable.
+
+*Task* :  Plot the variable `arsenic` 
+
+```{r "2 plotuni"}
+#< task
+# type your command
+#>
+plot(wells$arsenic)
+#< hint
+display("Apply the function plot to a the variable arsenic; do not forget to tell that arsenic belongs to the data frame 'wells' ")
+#>
+```
+
+#### Two variables scatterplot 
+
+*Task* :  Plot the variable `arsenic` against the variable  `dist` 
+
+```{r "2 plot2"}
+#< task
+# type your command
+#>
+plot(wells$arsenic, wells$dist)
+#< hint
+display("Apply the function plot with the two variables separated by a comma; Do not forget to state that the variables belong to the dataset wells ")
+#>
+```
+
+
+### Graphical examination of the relations
+
+We want to know how the decision to switch (the response variable) is related to some exogenous/explanatory variables (arsenic, dist, assoc and educ). It is good practice to begin with some simple graphical examination of the data before undertaking any formal modelling. 
+
+
+#< info "spine plots and spinograms"
+
+The command `spineplot(y ~ x)` will plot $P(y | x)$ against $P(x)$ where both $x$  is a explanatory variable and $y$ is a dependent variable. $y$ will be either a *binary* or *multinomial* variable (In R, the best way is to convert the initial numerical variable into a *factor*). Both quantities are approximated by the corresponding empirical relative frequencies.
+
+When $x$ is discrete (multinomial), we obtain a spine plot. When $x$ is numerical, $x$ is first discretized and then empirical relative frequencies are taken, we obtain a spinogram.
+
+Thus, spine plots can also be seen as a generalization of stacked bar plots where:
+
+  + the width of a bar corresponds to the relative frequency of x
++ the height of a bar corresponds to the relative frequency of y for the given x.
+
+For example, the command:
+```{r "2 info_spine1", echo=TRUE, warning=FALSE, eval=FALSE}
+ww <-spineplot(changed ~ arsenic, data = wells, breaks = 10)
+ww
+```
+will produce the following spinogram:
+
+```{r "2 info_spine2", echo=FALSE, warning=FALSE, message= FALSE, fig.height= 3, fig.asp = 0.7}
+library(readxl)
+library(tidyverse)
+wells <- read_excel("wells.xlsx")
+wells$changed <- factor(wells$switch, levels= c(0,1), labels=c("Keep", "Change"))
+wells %>% filter(dist < 250, arsenic < 7.5) -> wells_filtered
+ww <-spineplot(changed ~ arsenic, data = wells, breaks=10)
+ww
+```
+
+Here, the `arsenic` variable was discretized into 11 groups of arsenic levels. For each group, we have a relative frequency of observed actions (changed vs. kept)
+
+First, we observe that around 46% of the households having a well with aresnic levels between 0 and 1 switched to another well (492/(492+565)) and that switching wells increased with the levels of arsenic in the initial well. We can build the hypothesis that the probability to switch well was related to the level of arsenic found in the well.
+
+Second, we also observe that wells with levels of arsenic that are higher than 4 are not very common. We will have to bear this in mind when analyzing our results.
+
+#>
+
+
+As an exercise you will create spinogram to visualize how the proportions of factor variable `change`  evolve with the numerical variables `dist`. 
+
+**Task:**  Construct the spinogram of the dependent variable `changed` and the independent variable `dist`. To do this, follow the example given *spine plots and spinograms* info box.
+
+
+```{r "2 spinograms"}
+#< task
+# type your command here
+#>
+spineplot(formula=changed ~ dist, data = wells)
+
+#< hint
+display("Refer to the syntax in the Info box and change the name of the variable ")
+#>
+```
+
+**Quiz**
+
+#< quiz "Interpret a spinogram"
+Question: Based on the spinogram obtained in the previous task, tick the statements that you find true (Multiple answers are correct)
+mc:  
+  - The bars (20-40) is wider that the bar (120-140). This means there are less observations of new wells that are situated at 20-40 m than wells situated at 120-140 m
+  - The bars (20-40) is wider that the bar (120-140). This means there are more observations of new wells that are situated at 20-40 m than wells situated at 120-140 m*
+  - The frequency of households that changed for a new well decreased with the distance?*
+  - We should expect some significant negative relation between distance and change of wells*
+  - We should expect some significant positive relation between distance and change of wells
+  - We do not expect any correlation between distance and change of wells
+success: Great, your choices are correct! 
+failure: Try again.
+#>
+
+
+Write your answer text inside the quotes " " as an R String and press `Check`.
+(Note that you always see afterwards the message "Great, solved correctly."
+ But your answer will in fact be graded after you submit your problem set.)
+   
+```{r "2comment"}
+#< task_notest
+"
+Insert your answer here in those quotes
+  
+  
+  
+  
+  
+"
+#>
+""
+#< test
+holds.true(TRUE)
+#>
 

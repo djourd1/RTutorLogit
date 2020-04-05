@@ -58,4 +58,50 @@ The command `summary` is helpful to get a rapid overview of the data.
 # type your command
 ```
 
+### Making plots
 
+#### One variable plot 
+
+Another way to check the data that you will be using is to draw some plots to identify potential outliers. The easiest way to do this is to use the function `plot()` with one variable.
+
+*Task* :  Plot the variable `arsenic` 
+
+```{r "2__Check__5"}
+# type your command
+```
+
+#### Two variables scatterplot 
+
+*Task* :  Plot the variable `arsenic` against the variable  `dist` 
+
+```{r "2__Check__6"}
+# type your command
+```
+
+
+### Graphical examination of the relations
+
+We want to know how the decision to switch (the response variable) is related to some exogenous/explanatory variables (arsenic, dist, assoc and educ). It is good practice to begin with some simple graphical examination of the data before undertaking any formal modelling. 
+
+
+info("spine plots and spinograms") # Run this line (Strg-Enter) to show info
+
+
+As an exercise you will create spinogram to visualize how the proportions of factor variable `change`  evolve with the numerical variables `dist`. 
+
+**Task:**  Construct the spinogram of the dependent variable `changed` and the independent variable `dist`. To do this, follow the example given *spine plots and spinograms* info box.
+
+
+```{r "2__Check__9"}
+# type your command here
+```
+
+**Quiz**
+
+#! addon__quiz__Interpret a spinogram
+
+
+Write your answer text inside the quotes " " as an R String and press `Check`.
+(Note that you always see afterwards the message "Great, solved correctly."
+ But your answer will in fact be graded after you submit your problem set.)
+   
