@@ -27,6 +27,7 @@ We will check the data set. Each exercise are created so they do not depend on t
 **Task:** Import the data from `wells.xlsx` and save them in a data.frame named `wells`. In a second line of code, use the command `head` to view the first records of the data frame you have just created
 
 ```{r "2 import"}
+library(readxl)
 #< task
 # replace the #... with your codes
 # ...
