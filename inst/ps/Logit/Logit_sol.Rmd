@@ -18,203 +18,301 @@ show.ps(ps.name, user.name = "Damien", launch.browser=TRUE,
 
 #> 
 
+## Exercise Introduction
+
+We illustrate the steps of building, understanding, and checking the fit of a logistic
+regression model: modeling the decisions of households in Bangladesh to change their source of drinking water when their wells is contaminated by natural arsenic.
+
+In Bangladesh, the surface water is subject to contamination by microbes and people use water from deep wells for home consumption. However, many of the wells used for drinking water are contaminated with natural arsenic, affecting an estimated 100 million people. 
+
+Any locality can include wells with a range of arsenic levels, and even if your neighbor's well is safe, it does not mean that yours is safe. However, if your well has a high arsenic level, you can find a safe well nearby to get your water from - if you are willing to walk the distance and your neighbor is willing to share. Note that the amount of water needed for drinking is low enough that adding users to a well would not exhaust its capacity.
+
+A research team visited all the wells and labeled them with their arsenic level as well as a characterization as "safe" (below 0.5 in units of hundreds of micro-grams per liter) or "unsafe" (above 0.5). People with unsafe wells were encouraged to switch to nearby private or community wells or to new wells of their own construction. A few years later, the researchers returned to find out who had switched wells.
+
+We want to understand the factors predictive of well switching among the users of unsafe wells. Our outcome variable is $y_i = 1$ if household $i$ switched to a new well, or $y_i = 0$ if the household continued using its own well.
 
 
-## Exercise 2: Check -- Check the data
+This document is largely inspired by: *Gelman, A. and J. Hill, Data analysis using regression and multilevel/hierarchical models. 2006, Cambridge: Cambridge University Press. 651pp.*
+  
+All errors remain mainly mine!
 
-We will check the data set. Each exercise are created so they do not depend on the previous one. So we will first need to import the data again. To be sure, you remember the commands, you will need to import the data again.
+## Exercise 1 -- Import the data
 
-**Task:** Import the data from `wells.xlsx` and save them in a data.frame named `wells`. In a second line of code, use the command `head` to view the first records of the data frame you have just created
+The data are stored into an Excel file named `wells.xlsx`. So the first step will be to import these data for analysis with R. For this we will use the command `read_excel()` of the package `readxl`.
 
-```{r "2 import"}
-#< task
-# replace the #... with your codes
-# ...
-# ...
-#>
-wells <- read_excel("wells.xlsx")
-head(wells)
-#< hint
-display("On the first line, wells <- read_excel(\"wells.xlsx\"). On the second line, type:  head(wells)")
-#>
-```
+#< info "read_excel"
+The command `read_excel()` from the `readxl` package imports data from Excel into a data frame. If you set the working directory correctly and save the data in it, it will suffice to use the name of the excel file.
 
-#### Transform binary variables into factor
-
-To facilitate data analysis, we will transform some of the variables. The first transformation is to change the variable `switch`, currently a numeric variable into a factor variable. (Click on the info button just below if you do not know what a factor is)
-
-#< info "Factors"
-A factor is a data type in R that was developed to work with nomimal variables. If you are new to factors in R, here are 2 references to check before you go further:
-
-If you prefer video explanations, check this link: <a href="https://www.youtube.com/embed/xkRBfy8_2MU" target="_blank">R tutorial - Using Factors in R by DataCamp </a>
-
-If you prefer text explanations, check this link: <a href="https://www.stat.berkeley.edu/~s133/factors.html" target="_blank">Factors in R </a>
-#>
-
-**Task**: 
-
-1. Create a new factor by converting the numerical variable `switch` into a factor variable, where the labels of the levels are changed according to the rule 1 -> "Changed", 0 -> "Kept", and will be used in that order. Name your newly created variable `changed`
-
-2. View the first values of the variable to check the results obtained
-
-```{r "2 factor"}
-#< task
-# type your commands here
-#>
-wells$changed <- factor(wells$switch, levels= c(1,0), labels=c("Changed", "Kept"))
-head(wells$changed)
-#< hint
-display("You must apply the function `factor` to a the variable switch. Do not forget to specify the levels and the labels. Do not forget to create a new variable and do not forget to indicate that the variable `switch` and the variables `changed` belongs to the data frame `wells`.  ")
-#>
-```
-
-#### Summarize the data
-
-#< info "`summary` applied to a data.frame object"
-The command `summary` can be applied to different R objects, e.g. data frames, model results, etc. When applied to a data frame, it will output the basic statistics (minimum, maximum, mean, quartiles) of all the variables
-
-To summarize the variables on the data frame `data`, use the command
-```{r "2 info_summary",eval=FALSE}
-summary(data)
-```
-#>
-
-The command `summary` is helpful to get a rapid overview of the data.
-
-```{r "2 summary"}
-#< task
-# type your command
-#>
-summary(wells)
-#< hint
-display("Write: summary(xxx)  where xxx is the name of the data frame. Then press check.")
-#>
-```
-
-### Making plots
-
-#### One variable plot 
-
-Another way to check the data that you will be using is to draw some plots to identify potential outliers. The easiest way to do this is to use the function `plot()` with one variable.
-
-*Task* :  Plot the variable `arsenic` 
-
-```{r "2 plotuni"}
-#< task
-# type your command
-#>
-plot(wells$arsenic)
-#< hint
-display("Apply the function plot to a the variable arsenic; do not forget to tell that arsenic belongs to the data frame 'wells' ")
-#>
-```
-
-#### Two variables scatterplot 
-
-*Task* :  Plot the variable `arsenic` against the variable  `dist` 
-
-```{r "2 plot2"}
-#< task
-# type your command
-#>
-plot(wells$arsenic, wells$dist)
-#< hint
-display("Apply the function plot with the two variables separated by a comma; Do not forget to state that the variables belong to the dataset wells ")
-#>
-```
-
-
-### Graphical examination of the relations
-
-We want to know how the decision to switch (the response variable) is related to some exogenous/explanatory variables (arsenic, dist, assoc and educ). It is good practice to begin with some simple graphical examination of the data before undertaking any formal modelling. 
-
-
-#< info "spine plots and spinograms"
-
-The command `spineplot(y ~ x)` will plot $P(y | x)$ against $P(x)$ where both $x$  is a explanatory variable and $y$ is a dependent variable. $y$ will be either a *binary* or *multinomial* variable (In R, the best way is to convert the initial numerical variable into a *factor*). Both quantities are approximated by the corresponding empirical relative frequencies.
-
-When $x$ is discrete (multinomial), we obtain a spine plot. When $x$ is numerical, $x$ is first discretized and then empirical relative frequencies are taken, we obtain a spinogram.
-
-Thus, spine plots can also be seen as a generalization of stacked bar plots where:
-
-  + the width of a bar corresponds to the relative frequency of x
-+ the height of a bar corresponds to the relative frequency of y for the given x.
-
-For example, the command:
-```{r "2 info_spine1", echo=TRUE, warning=FALSE, eval=FALSE}
-ww <-spineplot(changed ~ arsenic, data = wells, breaks = 10)
-ww
-```
-will produce the following spinogram:
-
-```{r "2 info_spine2", echo=FALSE, warning=FALSE, message= FALSE, fig.height= 3, fig.asp = 0.7}
+```{r "1_",eval=FALSE}
 library(readxl)
-library(tidyverse)
-wells <- read_excel("wells.xlsx")
-wells$changed <- factor(wells$switch, levels= c(0,1), labels=c("Keep", "Change"))
-wells %>% filter(dist < 250, arsenic < 7.5) -> wells_filtered
-ww <-spineplot(changed ~ arsenic, data = wells, breaks=10)
-ww
+read_excel("wells.xlsx")
 ```
 
-Here, the `arsenic` variable was discretized into 11 groups of arsenic levels. For each group, we have a relative frequency of observed actions (changed vs. kept)
+You can also set the full path if you like to store the data not in the working directory:
 
-First, we observe that around 46% of the households having a well with aresnic levels between 0 and 1 switched to another well (492/(492+565)) and that switching wells increased with the levels of arsenic in the initial well. We can build the hypothesis that the probability to switch well was related to the level of arsenic found in the well.
+```{r "1__1",eval=FALSE}
+library(readxl)
+read_excel("C:/mypath/wells.xlsx")
+```
 
-Second, we also observe that wells with levels of arsenic that are higher than 4 are not very common. We will have to bear this in mind when analyzing our results.
+To store your results in a variable `wells` proceed as follows:
+
+```{r "1_2",eval=FALSE}
+library(readxl)
+wells <- read_excel("C:/mypath/wells.xlsx")
+```
+
+If you want to know more about the `read_excel()` command, you can use the help command
+
+```{r "1_3",eval=FALSE}
+library(readxl)
+? read_excel
+```
 
 #>
 
+Before you start entering your code, you need to press the edit button. This must be done in every first exercise of a chapter and after every optional exercise which you skipped. 
 
-As an exercise you will create spinogram to visualize how the proportions of factor variable `change`  evolve with the numerical variables `dist`. 
+**Task:** Use the command `read_excel()` to read in the file `wells.xlsx` and store it into a new variable variable named `wells`. If you need help how to use `read_excel()` check the info box above. 
 
-**Task:**  Construct the spinogram of the dependent variable `changed` and the independent variable `dist`. To do this, follow the example given *spine plots and spinograms* info box.
+If you need further advice, click the `hint` button, which contains more detailed information. If the hint does not help you, you can always access the solution with the `solution` button. Here you just need to remove the # in front of the code and replace the dots with the right commands. Then click the `check` button to run the command.
 
-
-```{r "2 spinograms"}
+```{r "1 read_excel"}
 #< task
-# type your command here
+library(readxl)
+# Type your code
 #>
-spineplot(formula=changed ~ dist, data = wells)
-
+wells <- read_excel("wells.xlsx")
 #< hint
-display("Refer to the syntax in the Info box and change the name of the variable ")
+display("Just write: wells <- read_excel(\"wells.xlsx\") and press check afterwards.")
 #>
+```      
+#< award "Starter"
+  Welcome to this problem set. We hope you will enjoy solving it. 
+  During the problem set you will earn more awards for complicated 
+  tasks or quizzes.
+#>
+
+The data set includes 3020 observations. We will only look at the first ones listed in the data set. In R this selection can be performed with the function head().
+
+**Task:** Take a look at the first observations of the data set. To do this just press `check`.
+```{r "1 Head"}
+#< task
+head(wells)
+#>
+``` 
+
+Notice that if you move your mouse over the header of a column, you will get additional information describing what this column stands for.
+In general you always have the possibility to look up these descriptions in this problem set. You just have to press `data`, this will get you to the `Data Explorer` section. If you press `Description` in the `Data Explorer`, you will get more detailed information about all variables in the data set. 
+
+### Quiz :Variable description
+
+#< quiz "Variable description"
+Question: Regarding the additional information you get by moving your mouse over the header of a column, what does the variable `switch` represent?
+sc:  
+  - A variable equal to one when the household switched wells and zero when it did not*
+  - A button that allows editing the data
+  - The number of times the households switched to a new well in the last five years
+
+success: Great, your answer is correct!
+failure: Try again.
+#>
+
+#< award "Quiz Starter"
+Congratulations, you solved the first quiz. Be prepared to solve more of them!!!
+#>
+
+
+## Exercise 4 Read --  Reading the results
+
+In this session, we learn to read the output of the glm model. The output includes different information that will essential to evaluate the quality of the model, as well as some information about the relations between explainatory and explained variables.
+
+The following Info button is giving you the meaning of all the different sections. Do not hesitate to consult it.
+
+#< info "Reading the results"
+
+If we apply these lines of codes, we will get the summarized results of the model we named logit.1
+
+```{r "inforead1a", eval=FALSE}
+logit.1 <- glm(changed ~ arsenic, data = wells, family = binomial)
+summary(logit.1)
 ```
 
-**Quiz**
+We will identify the results that are given
 
-#< quiz "Interpret a spinogram"
-Question: Based on the spinogram obtained in the previous task, tick the statements that you find true (Multiple answers are correct)
-mc:  
-  - The bars (20-40) is wider that the bar (120-140). This means there are less observations of new wells that are situated at 20-40 m than wells situated at 120-140 m
-  - The bars (20-40) is wider that the bar (120-140). This means there are more observations of new wells that are situated at 20-40 m than wells situated at 120-140 m*
-  - The frequency of households that changed for a new well decreased with the distance?*
-  - We should expect some significant negative relation between distance and change of wells*
-  - We should expect some significant positive relation between distance and change of wells
-  - We do not expect any correlation between distance and change of wells
-success: Great, your choices are correct! 
+```{r "inforead1", echo=FALSE}
+library(readxl)
+wells <- read_excel("wells.xlsx")
+wells$changed <- factor(wells$switch, levels= c(0, 1), labels = c( "Kept", "Changed"))
+wells$dist100 <- wells$dist/100
+logit.1 <- glm(changed ~ arsenic, data = wells, family = binomial)
+(x<-summary(logit.1))
+```
+
+The first line has the original call to the glm() function.
+
+```{r "inforead2", echo=FALSE}
+x$call
+```
+
+The second block of information gives you a summary of the deviance residuals. For a good model, residuals should be centered around $0$ and symmetrical.In our case, they are probably not really well centered around zero, which we should discuss further. However, usually we cannot expect to get a good model using only one variable.
+
+```{r "inforead3", echo=FALSE}
+sx<- round(summary(x$deviance.resid)[c(1:3,5:6)],3)
+names(sx) = c("Min",  "1Q" , "Median"   ,   "3Q "  ,  "Max"  )
+sx
+```
+
+#### Coefficients
+
+Then we have the coefficients. 
+```{r "inforead4", echo=FALSE}
+cx <- cbind(coefficients(x)[,1])
+attr(cx, "dimnames")[[2]] <- c("Estimate")
+cx
+```
+
+Let's write $P_i = P(changed \; | \; arsenic_i)$ the probability that household i changed wells for a given level of arsenic. We can write two equivalent models. 
+
+**Model 1**: The logit of the probability of changing wells is a linear function of the explanatory variables
+
+$$\Lambda^{-1}(P_i) = logit(P_i) = Log\left(\frac{P_i}{1-P_i}\right) = 0.305 + 0.379 \times arsenic_i$$
+Where $\Lambda$ is the cdf of the logistic function. Note that $\frac{P_i}{1-P_i}$ is known as the odds that an event will occur. So, this interpretation uses the expression of *log-odds of the event*. 
+
+**Model 2**: The probability of changing wells as a non-linear function (here the cdf of the logistic function, also known as inverse logit) of the explanatory variables.
+
+$$ P_i = \Lambda(0.305 + 0.379 \times arsenic_i)$$
+
+For further information about interpretations with these two models, see the corresponding info buttons.
+
+#### Other columns
+
+In the coefficients block, the next two columns shows of the Wald's test was computed for both coefficients
+
+```{r "inforead5", echo=FALSE}
+cbind(coefficients(x)[,2:3])
+```
+
+The last column corresponds to p-values
+```{r "inforead6", echo=FALSE}
+cp <- cbind(coefficients(x)[,4])
+attr(cp, "dimnames")[[2]] <- c("Pr(>|z|)")
+cp
+```
+
+Both p-values are well below 0.05, and thus, the coefficients are both statistically significant.
+Note that a small p-value alone isn't interesting; we also want large effect sizes, that's what the coefficients are telling us.
+
+Next, we see the default dispersion parameter used for this regression. 
+
+```{r "inforead7", echo=FALSE}
+cat("(Dispersion parameter for binomial family taken to be ", x$dispersion, ")")
+```
+When we do a linear regression, we estimate both the mean and the variance of the data. In contrast, when we do a logistic regression, we estimate the mean of the data, and the variance is derived from the mean. Since we are not estimating the variance from the data, it is possible that the variance is underestimated. If so, you can adjust the dispersion parameter in the summary() command. If you want to see the results then making the hypothesis that the dispersion is equal to 2, you can use the following command
+
+```{r "inforead8", eval=FALSE}
+summary(logit.1, dispersion=2)
+```
+
+Then we have the Null Deviance and the Residual Deviance.
+
+```{r "inforead9", echo=FALSE}
+cat("    Null deviance: ", x$null.deviance, "on" ,x$df.null , "degrees of freedom \n")
+
+cat("Residual deviance: ", x$deviance , "on" ,x$df.residual , "degrees of freedom")
+
+```
+
+These can be used to compare models, compute $R^2$, and an overall p-value. (We will come back to that later)
+
+Then we have the AIC. This acronym stands for Akaike Information Criterion, which, in this context is just the Residual Deviance ajusted for the number of parameters in the model (we will come back to that later as well)
+
+```{r "inforead10", echo=FALSE}
+cat("AIC: ", x$aic)
+```
+
+Finally, we have the number of Fisher Scoring iterations. This is the number of iterations to fit the model. The logistic regression uses an iterative maximum likelihood algorithm to fit the data. The Fisher method is the same as fitting a model by iteratively re-weighting the least squares. It indicates the optimal number of iterations. For example, beyond some number of iterations there are no practical gains. 
+```{r "inforead11", echo=FALSE}
+cat("Number of Fisher Scoring iterations: ", x$iter)
+```
+#>
+
+
+**Task 1** Write a logit model explaining the variable `changed` by 2 explanatory variables `arsenic` and `dist100` and save the results into an object called `logit.1`. Then ask for a summary of the results.
+
+```{r "4Model"}
+#< task
+wells <- read_excel("wells.xlsx")
+wells$changed <- factor(wells$switch, levels= c(0, 1), labels = c("Kept", "Changed"))
+wells$dist100 <- wells$dist/100
+# Type your model here
+
+#>
+#< test_arg
+other.sols = list(quote(
+  logit.1 <- glm(changed ~ dist100 + arsenic, data = wells, family=binomial)
+))
+#>
+logit.1 <- glm(changed ~ arsenic + dist100, data = wells, family=binomial)
+#< hint
+cat("Check again the info button above to make sure you understood the syntax of the function glm. Alternatively use the help(glm) to get more details about the function")
+#>
+summary(logit.1)
+#< hint
+display("Do not forget to use the summary() function")
+#>
+
+```
+#< award "Master of Logit"
+Congratulations, you wrote a logit model. Now be prepared to look for the results you need!
+#>
+
+
+**Quiz 1 :** Significant coefficients
+
+#< quiz "Find significant coefficients"
+question: Given the model you just wrote, identify the coefficients of the model that were statistically different from zero at 5% threshold 
+sc:  
+  - intercept
+  - intercept + arsenic
+  - intercept + arsenic + dist100
+  - arsenic 
+  - arsenic + dist100 *
+  - dist100
+  - intercept + dist100
+success: Great, your choice is correct! 
 failure: Try again.
 #>
 
 
-Write your answer text inside the quotes " " as an R String and press `Check`.
-(Note that you always see afterwards the message "Great, solved correctly."
- But your answer will in fact be graded after you submit your problem set.)
-   
-```{r "2comment",results='hide'}
-#< task_notest
-" 
-Insert your answer here in those quotes
-  
-  
-  
-  
-  
-"
-#>
-""
-#< test
-holds.true(TRUE)
+**Quiz 2 :** Signs of coefficients and interpretation
+
+#< quiz "Signs of coefficients"
+question: Given the model results, identify the true statements (multiple solutions possible) 
+mc:  
+  - The arsenic coefficient is positive, meaning that the more arsenic in the initial well, the more the households has switched wells *
+  - The arsenic coefficient is positive, meaning that the more arsenic in the initial well, the less the households has switched wells  
+  - The dist100 coefficient is positive, meaning that the more arsenic in the initial well, the less the households has switched wells
+  - The dist100 coefficient is negative, meaning that the more distance for a new well, the less the households has switched wells *
+  - The dist100 coefficient is positive, meaning that the more distance for a new well, the less the households has switched wells
+success: Great, your choices are correct! 
+failure: Try again.
 #>
 
+**Quiz 3 :** Change in model deviance per degrees of freedom
+
+#< quiz "Difference between residual and null deviances"
+question: Given the model results, calculate the difference `Residual deviance - Null deviance`, and calculate the difference in degrees of freedom between the two models.
+Which of these statement is true:
+sc:  
+  - 240.3 for 5 degrees of freedom
+  - 187.4 for 2 degrees of freedom *
+  - 147.7 for 2 degrees of freedom
+  - 187.4 for 2 degrees of freedom
+  - 187.4 for 3020 degrees of freedom
+  - 280.1 for 3 degrees of freedom
+success: Great, your choices are correct! 
+failure: Try again.
+#>
+
+

@@ -18,90 +18,87 @@ check.problem.set('Logit', ps.dir, ps.file, user.name=user.name, reset=FALSE)
 Welcome
 
 
+## Exercise Introduction
+
+We illustrate the steps of building, understanding, and checking the fit of a logistic
+regression model: modeling the decisions of households in Bangladesh to change their source of drinking water when their wells is contaminated by natural arsenic.
+
+In Bangladesh, the surface water is subject to contamination by microbes and people use water from deep wells for home consumption. However, many of the wells used for drinking water are contaminated with natural arsenic, affecting an estimated 100 million people. 
+
+Any locality can include wells with a range of arsenic levels, and even if your neighbor's well is safe, it does not mean that yours is safe. However, if your well has a high arsenic level, you can find a safe well nearby to get your water from - if you are willing to walk the distance and your neighbor is willing to share. Note that the amount of water needed for drinking is low enough that adding users to a well would not exhaust its capacity.
+
+A research team visited all the wells and labeled them with their arsenic level as well as a characterization as "safe" (below 0.5 in units of hundreds of micro-grams per liter) or "unsafe" (above 0.5). People with unsafe wells were encouraged to switch to nearby private or community wells or to new wells of their own construction. A few years later, the researchers returned to find out who had switched wells.
+
+We want to understand the factors predictive of well switching among the users of unsafe wells. Our outcome variable is $y_i = 1$ if household $i$ switched to a new well, or $y_i = 0$ if the household continued using its own well.
 
 
-## Exercise 2: Check -- Check the data
+This document is largely inspired by: *Gelman, A. and J. Hill, Data analysis using regression and multilevel/hierarchical models. 2006, Cambridge: Cambridge University Press. 651pp.*
+  
+All errors remain mainly mine!
 
-We will check the data set. Each exercise are created so they do not depend on the previous one. So we will first need to import the data again. To be sure, you remember the commands, you will need to import the data again.
+## Exercise 1 -- Import the data
 
-**Task:** Import the data from `wells.xlsx` and save them in a data.frame named `wells`. In a second line of code, use the command `head` to view the first records of the data frame you have just created
+The data are stored into an Excel file named `wells.xlsx`. So the first step will be to import these data for analysis with R. For this we will use the command `read_excel()` of the package `readxl`.
 
-```{r "2__Check"}
-# replace the #... with your codes
-# ...
-# ...
+info("read_excel") # Run this line (Strg-Enter) to show info
+
+Before you start entering your code, you need to press the edit button. This must be done in every first exercise of a chapter and after every optional exercise which you skipped. 
+
+**Task:** Use the command `read_excel()` to read in the file `wells.xlsx` and store it into a new variable variable named `wells`. If you need help how to use `read_excel()` check the info box above. 
+
+If you need further advice, click the `hint` button, which contains more detailed information. If the hint does not help you, you can always access the solution with the `solution` button. Here you just need to remove the # in front of the code and replace the dots with the right commands. Then click the `check` button to run the command.
+
+```{r "1__5"}
+library(readxl)
+# Type your code
 ```
 
-#### Transform binary variables into factor
+The data set includes 3020 observations. We will only look at the first ones listed in the data set. In R this selection can be performed with the function head().
 
-To facilitate data analysis, we will transform some of the variables. The first transformation is to change the variable `switch`, currently a numeric variable into a factor variable. (Click on the info button just below if you do not know what a factor is)
-
-info("Factors") # Run this line (Strg-Enter) to show info
-
-**Task**: 
-
-1. Create a new factor by converting the numerical variable `switch` into a factor variable, where the labels of the levels are changed according to the rule 1 -> "Changed", 0 -> "Kept", and will be used in that order. Name your newly created variable `changed`
-
-2. View the first values of the variable to check the results obtained
-
-```{r "2__Check__2"}
-# type your commands here
+**Task:** Take a look at the first observations of the data set. To do this just press `check`.
+```{r "1__6"}
+head(wells)
 ```
 
-#### Summarize the data
+Notice that if you move your mouse over the header of a column, you will get additional information describing what this column stands for.
+In general you always have the possibility to look up these descriptions in this problem set. You just have to press `data`, this will get you to the `Data Explorer` section. If you press `Description` in the `Data Explorer`, you will get more detailed information about all variables in the data set. 
 
-info("`summary` applied to a data.frame object") # Run this line (Strg-Enter) to show info
+### Quiz :Variable description
 
-The command `summary` is helpful to get a rapid overview of the data.
+#! addon__quiz__Variable description
 
-```{r "2__Check__4"}
-# type your command
-```
 
-### Making plots
 
-#### One variable plot 
+## Exercise 4 Read --  Reading the results
 
-Another way to check the data that you will be using is to draw some plots to identify potential outliers. The easiest way to do this is to use the function `plot()` with one variable.
+In this session, we learn to read the output of the glm model. The output includes different information that will essential to evaluate the quality of the model, as well as some information about the relations between explainatory and explained variables.
 
-*Task* :  Plot the variable `arsenic` 
+The following Info button is giving you the meaning of all the different sections. Do not hesitate to consult it.
 
-```{r "2__Check__5"}
-# type your command
-```
+info("Reading the results") # Run this line (Strg-Enter) to show info
 
-#### Two variables scatterplot 
 
-*Task* :  Plot the variable `arsenic` against the variable  `dist` 
+**Task 1** Write a logit model explaining the variable `changed` by 2 explanatory variables `arsenic` and `dist100` and save the results into an object called `logit.1`. Then ask for a summary of the results.
 
-```{r "2__Check__6"}
-# type your command
+```{r "4_Read__13"}
+wells <- read_excel("wells.xlsx")
+wells$changed <- factor(wells$switch, levels= c(0, 1), labels = c("Kept", "Changed"))
+wells$dist100 <- wells$dist/100
+# Type your model here
+
 ```
 
 
-### Graphical examination of the relations
+**Quiz 1 :** Significant coefficients
 
-We want to know how the decision to switch (the response variable) is related to some exogenous/explanatory variables (arsenic, dist, assoc and educ). It is good practice to begin with some simple graphical examination of the data before undertaking any formal modelling. 
-
-
-info("spine plots and spinograms") # Run this line (Strg-Enter) to show info
+#! addon__quiz__Find significant coefficients
 
 
-As an exercise you will create spinogram to visualize how the proportions of factor variable `change`  evolve with the numerical variables `dist`. 
+**Quiz 2 :** Signs of coefficients and interpretation
 
-**Task:**  Construct the spinogram of the dependent variable `changed` and the independent variable `dist`. To do this, follow the example given *spine plots and spinograms* info box.
+#! addon__quiz__Signs of coefficients
 
+**Quiz 3 :** Change in model deviance per degrees of freedom
 
-```{r "2__Check__9"}
-# type your command here
-```
+#! addon__quiz__Difference between residual and null deviances
 
-**Quiz**
-
-#! addon__quiz__Interpret a spinogram
-
-
-Write your answer text inside the quotes " " as an R String and press `Check`.
-(Note that you always see afterwards the message "Great, solved correctly."
- But your answer will in fact be graded after you submit your problem set.)
-   

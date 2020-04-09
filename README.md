@@ -11,16 +11,18 @@ install.packages("RTutor",repos = c("https://skranz-repo.github.io/drat/",getOpt
 if (!require(devtools))
   install.packages("devtools")
 
-devtools::install_github("djourd1/RTutorLogit", upgrade_dependencies=FALSE)
+
+
 ```
 
 ## 2. Show and work on the problem set
 To start the problem set first create a working directory in which files like the data sets and your solution will be stored. Then adapt and run the following code.
-```s
+
+```
 library(RTutorLogit)
 
 # Adapt your working directory to an existing folder
-setwd("C:/problemsets/RTutorLogit")
+setwd("D:/Mes Donnees/__modelesR/RTutor/Logit/RTutorLogit")
 # Adapt your user name
 run.ps(user.name="Jon Doe", package="RTutorLogit",
        auto.save.code=TRUE, clear.user=FALSE)
